@@ -85,6 +85,8 @@ public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 
 	private RequestMatcher requireCsrfProtectionMatcher = CsrfFilter.DEFAULT_CSRF_MATCHER;
 
+	private Boolean allowRequestParameter = true;
+
 	private List<RequestMatcher> ignoredCsrfProtectionMatchers = new ArrayList<>();
 
 	private SessionAuthenticationStrategy sessionAuthenticationStrategy;
@@ -121,6 +123,16 @@ public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 	public CsrfConfigurer<H> requireCsrfProtectionMatcher(RequestMatcher requireCsrfProtectionMatcher) {
 		Assert.notNull(requireCsrfProtectionMatcher, "requireCsrfProtectionMatcher cannot be null");
 		this.requireCsrfProtectionMatcher = requireCsrfProtectionMatcher;
+		return this;
+	}
+
+	/**
+	 * Specify whether to allow CSRF token to be sent as a request parameter
+	 * @param {boolean} whether to allow request parameter
+	 * @return the {@link CsrfConfigurer} for further customizations
+	 */
+	public CsrfConfigurer<H> allowRequestParameter(Boolean allowRequestParameter) {
+		this.allowRequestParameter = allowRequestParameter;
 		return this;
 	}
 
@@ -210,6 +222,11 @@ public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 		if (accessDeniedHandler != null) {
 			filter.setAccessDeniedHandler(accessDeniedHandler);
 		}
+
+		if (allowRequestParameter != null) {
+			filter.setAllowRequestParameter(allowRequestParameter);
+		}
+
 		LogoutConfigurer<H> logoutConfigurer = http.getConfigurer(LogoutConfigurer.class);
 		if (logoutConfigurer != null) {
 			logoutConfigurer.addLogoutHandler(new CsrfLogoutHandler(this.csrfTokenRepository));

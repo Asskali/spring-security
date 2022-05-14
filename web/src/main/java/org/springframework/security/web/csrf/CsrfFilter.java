@@ -79,6 +79,8 @@ public final class CsrfFilter extends OncePerRequestFilter {
 	 */
 	private static final String SHOULD_NOT_FILTER = "SHOULD_NOT_FILTER" + CsrfFilter.class.getName();
 
+	private boolean ALLOW_REQUEST_PARAMETER = true;
+
 	private final Log logger = LogFactory.getLog(getClass());
 
 	private final CsrfTokenRepository tokenRepository;
@@ -118,7 +120,7 @@ public final class CsrfFilter extends OncePerRequestFilter {
 			return;
 		}
 		String actualToken = request.getHeader(csrfToken.getHeaderName());
-		if (actualToken == null) {
+		if (actualToken == null && ALLOW_REQUEST_PARAMETER) {
 			actualToken = request.getParameter(csrfToken.getParameterName());
 		}
 		if (!equalsConstantTime(csrfToken.getToken(), actualToken)) {
@@ -165,6 +167,17 @@ public final class CsrfFilter extends OncePerRequestFilter {
 	public void setAccessDeniedHandler(AccessDeniedHandler accessDeniedHandler) {
 		Assert.notNull(accessDeniedHandler, "accessDeniedHandler cannot be null");
 		this.accessDeniedHandler = accessDeniedHandler;
+	}
+
+	/**
+	 *Specifies if CSRF token can be sent in as a request parameter or only as an HTTP header.
+	 *
+	 * <p>
+	 *     The default is to allow CSRF token to be sent as a request parameter.
+	 * </p>
+	 */
+	public void setAllowRequestParameter(boolean allowRequestParameter) {
+		this.ALLOW_REQUEST_PARAMETER = allowRequestParameter;
 	}
 
 	/**

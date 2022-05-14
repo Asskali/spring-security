@@ -48,9 +48,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
-/**
+/**g
  * @author Rob Winch
  *
  */
@@ -128,7 +128,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.deniedHandler).handle(eq(this.request), eq(this.response), any(InvalidCsrfTokenException.class));
-		verifyZeroInteractions(this.filterChain);
+		verifyNoInteractions(this.filterChain);
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.deniedHandler).handle(eq(this.request), eq(this.response), any(InvalidCsrfTokenException.class));
-		verifyZeroInteractions(this.filterChain);
+		verifyNoInteractions(this.filterChain);
 	}
 
 	@Test
@@ -152,7 +152,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.deniedHandler).handle(eq(this.request), eq(this.response), any(InvalidCsrfTokenException.class));
-		verifyZeroInteractions(this.filterChain);
+		verifyNoInteractions(this.filterChain);
 	}
 
 	@Test
@@ -166,7 +166,21 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.deniedHandler).handle(eq(this.request), eq(this.response), any(InvalidCsrfTokenException.class));
-		verifyZeroInteractions(this.filterChain);
+		verifyNoInteractions(this.filterChain);
+	}
+
+	@Test
+	public void doFilterAccessDeniedWhenParameterButParameterNotAllowed()
+			throws ServletException, IOException {
+		this.filter.setAllowRequestParameter(false);
+		given(this.requestMatcher.matches(this.request)).willReturn(true);
+		given(this.tokenRepository.loadToken(this.request)).willReturn(this.token);
+		this.request.setParameter(this.token.getParameterName(), this.token.getToken());
+		this.filter.doFilter(this.request, this.response, this.filterChain);
+		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
+		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
+		verify(this.deniedHandler).handle(eq(this.request), eq(this.response), any(InvalidCsrfTokenException.class));
+		verifyNoInteractions(this.filterChain);
 	}
 
 	@Test
@@ -177,7 +191,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.filterChain).doFilter(this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 	}
 
 	@Test
@@ -188,7 +202,7 @@ public class CsrfFilterTests {
 		assertToken(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertToken(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.filterChain).doFilter(this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 	}
 
 	@Test
@@ -200,7 +214,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.filterChain).doFilter(this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 	}
 
 	@Test
@@ -214,7 +228,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.filterChain).doFilter(this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 	}
 
 	@Test
@@ -226,7 +240,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		verify(this.filterChain).doFilter(this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 		verify(this.tokenRepository, never()).saveToken(any(CsrfToken.class), any(HttpServletRequest.class),
 				any(HttpServletResponse.class));
 	}
@@ -243,7 +257,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(HttpServletResponse.class.getName())).isEqualTo(this.response);
 		verify(this.filterChain).doFilter(this.request, this.response);
 		verify(this.tokenRepository).saveToken(this.token, this.request, this.response);
-		verifyZeroInteractions(this.deniedHandler);
+		verifyNoInteractions(this.deniedHandler);
 	}
 
 	@Test
@@ -256,7 +270,7 @@ public class CsrfFilterTests {
 			this.request.setMethod(method);
 			this.filter.doFilter(this.request, this.response, this.filterChain);
 			verify(this.filterChain).doFilter(this.request, this.response);
-			verifyZeroInteractions(this.deniedHandler);
+			verifyNoInteractions(this.deniedHandler);
 		}
 	}
 
@@ -277,7 +291,7 @@ public class CsrfFilterTests {
 			this.filter.doFilter(this.request, this.response, this.filterChain);
 			verify(this.deniedHandler).handle(eq(this.request), eq(this.response),
 					any(InvalidCsrfTokenException.class));
-			verifyZeroInteractions(this.filterChain);
+			verifyNoInteractions(this.filterChain);
 		}
 	}
 
@@ -292,7 +306,7 @@ public class CsrfFilterTests {
 			this.filter.doFilter(this.request, this.response, this.filterChain);
 			verify(this.deniedHandler).handle(eq(this.request), eq(this.response),
 					any(InvalidCsrfTokenException.class));
-			verifyZeroInteractions(this.filterChain);
+			verifyNoInteractions(this.filterChain);
 		}
 	}
 
@@ -306,7 +320,7 @@ public class CsrfFilterTests {
 		assertThat(this.request.getAttribute(this.token.getParameterName())).isEqualTo(this.token);
 		assertThat(this.request.getAttribute(CsrfToken.class.getName())).isEqualTo(this.token);
 		assertThat(this.response.getStatus()).isEqualTo(HttpServletResponse.SC_FORBIDDEN);
-		verifyZeroInteractions(this.filterChain);
+		verifyNoInteractions(this.filterChain);
 	}
 
 	@Test
@@ -317,7 +331,7 @@ public class CsrfFilterTests {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		CsrfFilter.skipRequest(request);
 		filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
-		verifyZeroInteractions(repository);
+		verifyNoInteractions(repository);
 	}
 
 	// gh-9561
